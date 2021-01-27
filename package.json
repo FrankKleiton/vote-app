@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "graphql-tools": "^7.0.2",
+    "graphql-yoga": "^1.18.3"
+  }
+}
