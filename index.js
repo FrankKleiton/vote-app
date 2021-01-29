@@ -57,14 +57,40 @@ const resolvers = {
         where: {
           id,
         },
-        include: { polls: true }
+        include: { polls: true },
       });
     },
     users: async (parent, args, context) => {
       return context.prisma.user.findMany({
-        include: { polls: true }
+        include: { polls: true },
       });
-    }
+    },
+    poll: async (parent, args, context) => {
+      const { id } = args;
+      return context.prisma.poll.findOne({
+        where: {
+          id,
+        },
+        include: {
+          user: true,
+          options: true,
+          votes: {
+            select: { user: true, option: true },
+          },
+        },
+      });
+    },
+    polls: async (parent, args, context) => {
+      return context.prisma.poll.findMany({
+        include: {
+          user: true,
+          options: true,
+          votes: {
+            select: { user: true, option: true },
+          },
+        },
+      });
+    },
   },
   Mutation: {
     createUser: (parent, args, context, info) => {
@@ -81,15 +107,15 @@ const resolvers = {
         data: {
           description,
           user: {
-            connect: { id }
+            connect: { id },
           },
           options: {
-            create: options.map(option => ({ text: option })),
+            create: options.map((option) => ({ text: option })),
           },
         },
       });
       return newPoll;
-    }
+    },
   },
 };
 
@@ -98,11 +124,11 @@ const schema = makeExecutableSchema({
   resolvers,
 });
 const prisma = new PrismaClient();
-const server = new GraphQLServer({ 
+const server = new GraphQLServer({
   schema,
   context: {
-    prisma
-  } 
+    prisma,
+  },
 });
 
 const options = {
