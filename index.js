@@ -74,8 +74,23 @@ const resolvers = {
         },
       });
       return newUser;
+    },
+    createPoll: (parent, args, context, info) => {
+      const { description, id, options } = args;
+      const newPoll = context.prisma.poll.create({
+        data: {
+          description,
+          user: {
+            connect: { id }
+          },
+          options: {
+            create: options.map(option => ({ text: option })),
+          },
+        },
+      });
+      return newPoll;
     }
-  }
+  },
 };
 
 const schema = makeExecutableSchema({
