@@ -17,10 +17,16 @@ const typeDefs = `
   }
   type Poll {
     id :ID!
-    description: :String!
+    description :String!
     user :User!
     options :[Option!]
     votes :[Vote]
+  }
+  type Option {
+    id          :ID!
+    text        :String!
+    poll        :Poll!
+    votes       :[Vote]
   }
   type Vote {
     id :ID!
@@ -35,18 +41,25 @@ const typeDefs = `
       id: ID!
       options: [String!]
     ): Poll
+    createVote(
+      userID: ID!
+      pollID: ID!
+      optionID: ID!
+    ): Vote
   }
-  createVote(
-    userID: ID!
-    pollID: ID!
-    optionID: ID!
-  ): Vote
 `;
 
 const resolvers = {
-  Query: {
-    hello: (_, { name }) => `Hello ${name || World}`,
-  },
+  Mutation: {
+    createUser: (parent, args, context, info) => {
+      const newUser = context.prisma.user.create({
+        data: {
+          name: args.name,
+        },
+      });
+      return newUser;
+    }
+  }
 };
 
 const schema = makeExecutableSchema({
